@@ -1,5 +1,5 @@
 # Search for and Delete Chat Messages in Teams
-**By Kas Tsaedu*
+*By Kas Tsaedu*
 ## Overview
 This guide primarily outlines the process for searching for and deleting chat messages in Teams using eDiscovery (Premium) and the Microsoft Graph Explorer. I developed this draft due to the numerous discrepancies and inconsistencies found in the official Microsoft documentation titled “Search for and delete chat messages in Teams” While attempting to follow this document in my job, I discovered significant errors and a lack of clarity in the official Microsoft KBA. This motivated me to write a clearer and more user-friendly set of instructions. Administrators can use this guide to find and remove sensitive or inappropriate content or to respond to data spillage incidents where confidential or malicious information has been released through Teams chat messages in Microsoft 365.
   Minimum Admin role required to complete the task:
@@ -56,7 +56,7 @@ Minimum Admin role required to complete the task:
 
 The following figure indicates the ingestion flow of Teams data to both Exchange and SharePoint for Teams Files and Messages. Target the correct data location path accordingly.
 
-!image 
+
 
 ![alt text](image-5.png)
 
@@ -84,22 +84,23 @@ You can run the following command to disable the hold assigned to the affected u
 # Example command to disable a hold
 Set-Mailbox -Identity <UserIdentity> -LitigationHoldEnabled $false
 
+```
 
 Run the following command to get information about any organization-wide retention policies:
 
-# Command to get retention policies
+```powershell
+Command to get retention policies
 Get-RetentionCompliancePolicy -Identity <retention policy GUID without prefix> | FL Name
-
+```
 
 Run the following command in Exchange Online PowerShell to identify the In-Place Hold placed on the mailbox. Use the GUID for the In-Place Hold that you identified:
 
+```powershell
 # Command to identify In-Place Hold
 Get-Mailbox -Identity <UserIdentity> | FL InPlaceHolds
 
+```
 
-
-
-!Image
 
 ![alt text](image-4.png)
 
@@ -114,8 +115,6 @@ Get-Mailbox <username> | FL InPlaceHolds
 Check the InPlaceHolds property and ensure the prefix shows empty or (-MBX).
 
 
-
-!Image
 
 
 ## Step 5: Delete Chat Messages from Teams
@@ -173,11 +172,12 @@ You can also delete chat messages using PowerShell. For example, to delete messa
 # Example command to delete messages in the US Government cloud
 Remove-TeamsChatMessage -Identity <MessageID> -Environment USGov
 
+```
 
 A maximum of 10 items per mailbox are deleted when you run the previous command. For multiple items (more than 10), you need to rerun the script at different time intervals.
 
 
-Step 6: Verify Chat Messages are Deleted
+## Step 6: Verify Chat Messages are Deleted
 After running the POST request to delete chat messages, these messages are removed from the Teams client and replaced with an automatically generated message stating “This message was deleted by an admin”. Admins can confirm with end users if the original chat messages are replaced by the auto-generated messages.
 
 Alternatively, administrators can rerun the content search and verify if any matching messages are found.
@@ -189,7 +189,8 @@ Deleted chat messages are moved to the Substrate Holds folder, which is a hidden
 
 Note: SingleItemRecoveryEnabled can be switched to True by itself (broken by design) after running the purge request. You might need to recheck after running the purge request in Step 5 if items are not purged successfully.
 
-Step 7: Reapply Holds and Retention Policies to Data Sources
+## Step 7: Reapply Holds and Retention Policies to Data Sources
+
 After verifying that chat messages are deleted and removed from the Teams client, reapply the holds and retention policies that were removed in Step 4.
 
 Note: End users have the capability to purge items during the window after removing the hold and retentions (Step 4) and before reapplying the hold (Step 7). Reapplying the holds and retention policies removed in Step 4 as soon as the purge is verified is crucial to minimize the risk of losing data.
@@ -216,12 +217,6 @@ Feel free to contribute to this guide by submitting a pull request or opening an
 
 
 ## Reference
-Search for and delete chat messages in Teams | Microsoft Learn
-
-Delete items in the Recoverable Items folder | Microsoft Learn
-
-Learn about retention for Teams | Microsoft Learn
-
-[Search for and delete chat messages in Teams | Microsoft Learn]
-[Delete items in the Recoverable Items folder | Microsoft Learn]
-[Learn about retention for Teams | Microsoft Learn]
+https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages  
+https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder
+https://learn.microsoft.com/en-us/purview/retention-policies-teams
