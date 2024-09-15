@@ -197,8 +197,10 @@ Note: End users have the capability to purge items during the window after remov
 
 Example: If SingleItemRecovery was disabled in Step 4, reapply the hold by running the following script:
 
+```powershell
 Set-Mailbox <username> -SingleItemRecoveryEnabled $True
 
+```
 Follow the same process to reapply all removed holds/retention policies.
 
 Remove users from the Teams retention exclusion (if any): After the users are removed from the Teams retention exception, they are now subject to the organization-wide retention policy.
@@ -206,8 +208,6 @@ Remove users from the Teams retention exclusion (if any): After the users are re
 ![alt text](image.png)
 
 Follow the same process and reapply ALL the holds and retention policies that we removed in the earlier Step 4
-
-```
 
 ## Conclusion
 This guide provides a streamlined process for searching and deleting chat messages in Teams, addressing the gaps and errors in the official documentation. By following these steps, administrators can effectively manage sensitive or inappropriate content in Teams.
