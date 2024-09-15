@@ -234,9 +234,9 @@ Feel free to contribute to this guide by submitting a pull request or opening an
 Thank you for reading!
 
 ## Reference
-[Search for and delete chat messages in Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages) 
-[Delete items in the Recoverable Items folder | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder)
-[Learn about retention for Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/retention-policies-teams)  
+- [Search for and delete chat messages in Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages) 
+- [Delete items in the Recoverable Items folder | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder)
+- [Learn about retention for Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/retention-policies-teams)  
 
 
 
