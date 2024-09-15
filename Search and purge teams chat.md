@@ -1,5 +1,6 @@
 # Search for and Delete Chat Messages in Teams
-                 *auther: Kas Tsaedu*
+*auther: Kas Tsaedu*
+
 ## Overview
 This guide primarily outlines the process for searching for and deleting chat messages in Teams using eDiscovery (Premium) and the Microsoft Graph Explorer. I developed this draft due to the numerous discrepancies and inconsistencies found in the official Microsoft documentation titled “Search for and delete chat messages in Teams” While attempting to follow this document in my job, I discovered significant errors and a lack of clarity in the official Microsoft KBA. This motivated me to write a clearer and more user-friendly set of instructions. Administrators can use this guide to find and remove sensitive or inappropriate content or to respond to data spillage incidents where confidential or malicious information has been released through Teams chat messages in Microsoft 365.
 
@@ -233,9 +234,9 @@ Feel free to contribute to this guide by submitting a pull request or opening an
 
 
 ## Reference
-https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages  
-https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder
-https://learn.microsoft.com/en-us/purview/retention-policies-teams
+[Search for and delete chat messages in Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages)  
+[Delete items in the Recoverable Items folder | Microsoft Learn](https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder)
+[Learn about retention for Teams | Microsoft Learn](https://learn.microsoft.com/en-us/purview/retention-policies-teams)
 
 
 # Knowledge Base Article
