@@ -250,9 +250,7 @@ If you have any comments or suggestions, please leave a comment here.
 
 ## Content
 
-- Topic 1
-- Topic 2
-- Topic 3
+- Search for and Delete Chat Messages in Teams
 
 ## Feedback
 
