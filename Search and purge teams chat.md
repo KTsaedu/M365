@@ -1,11 +1,7 @@
 # Search for and Delete Chat Messages in Teams
-*By Kas Tsaedu*
+                 *auther: Kas Tsaedu*
 ## Overview
 This guide primarily outlines the process for searching for and deleting chat messages in Teams using eDiscovery (Premium) and the Microsoft Graph Explorer. I developed this draft due to the numerous discrepancies and inconsistencies found in the official Microsoft documentation titled “Search for and delete chat messages in Teams” While attempting to follow this document in my job, I discovered significant errors and a lack of clarity in the official Microsoft KBA. This motivated me to write a clearer and more user-friendly set of instructions. Administrators can use this guide to find and remove sensitive or inappropriate content or to respond to data spillage incidents where confidential or malicious information has been released through Teams chat messages in Microsoft 365.
-  Minimum Admin role required to complete the task:
-* eDiscovery Manager: To create an eDiscovery (Premium) case and use collections to search for chat messages
-* Search and purge: To run the purge (To delete chat messages)
-* Graph: API Permission to eDiscovery.Read.All and eDiscovery.ReadWrite.All permissions: To complete the purge process in Graph Explorer or PowerShell 
 
 
 ## Prerequisites
@@ -20,7 +16,7 @@ Minimum Admin role required to complete the task:
 
 ## Step 1: Create a Case in eDiscovery (Premium)
 
-1. Go to Microsoft Compliance Center and sign in.
+1. Go to [Microsoft Compliance Center](https://compliance.microsoft.com) and sign in.
 2. Select **eDiscovery > Premium**.
 3. Go to the **Cases** tab and click on **Create a case**.
 4. On the **Name and description** page, provide a name and description for your case.
@@ -76,6 +72,16 @@ Here is a list of mailbox properties you might need to collect for the identifie
 - **DelayReleaseHoldApplied**
 - **RetentionHoldEnabled**
 
+```powershell
+#  Example command to check for any hold or organization wide retention
+
+Get-Mailbox <username> | FL SingleItemRecoveryEnabled,RetainDeletedItemsFor
+Get-Mailbox <username> | FL *hold*
+Get-mailbox <username> | fl userp*, guid, inp*, ret*, lit*, sing*, delay*, elc*, *quo*
+
+
+```
+
 If all these settings are `False`, no action is required. If any of these holds are enabled (`True`) and block the purging process, you will need to disable them. For example, if the deleted item retention period isn't set for 30 days (the maximum value in Exchange Online), you can increase it.
 
 You can run the following command to disable the hold assigned to the affected user:
@@ -83,28 +89,33 @@ You can run the following command to disable the hold assigned to the affected u
 ```powershell
 # Example command to disable a hold
 Set-Mailbox -Identity <UserIdentity> -LitigationHoldEnabled $false
+Set-Mailbox <username> -SingleItemRecoveryEnabled $false #To enable single item recovery:
+Set-Mailbox <username> -RetainDeletedItemsFor 30       #To increase the deleted item retention period (This assumes that the current setting is less than 30 days) #
+Set-Mailbox <username> -RemoveDelayHoldApplied           #To remove the delay hold #
+Set-Mailbox <username> -RemoveDelayReleaseHoldApplied         #To remove the delay release hold #
 
 ```
 
 Run the following command to get information about any organization-wide retention policies:
 
 ```powershell
-Command to get retention policies
-Get-RetentionCompliancePolicy -Identity <retention policy GUID without prefix> | FL Name
+# Command to identify In-Place Hold
+Get-Mailbox -Identity <UserIdentity> | FL InPlaceHolds
+Get-OrganizationConfig | Select-Object -ExpandProperty InPlaceHolds
+Get-organizationconfig | fl OrganizationId, name, guid, InPlaceHolds, ElcProcessingDisabled
+
 ```
 
 Run the following command in Exchange Online PowerShell to identify the In-Place Hold placed on the mailbox. Use the GUID for the In-Place Hold that you identified:
 
 ```powershell
-# Command to identify In-Place Hold
-Get-Mailbox -Identity <UserIdentity> | FL InPlaceHolds
-
+Command to get retention policies
+Get-RetentionCompliancePolicy -Identity <retention policy GUID without prefix> | FL Name
 ```
-
 
 ![alt text](image-4.png)
 
-After identifying the retention policy, go to the **Data lifecycle management > Microsoft 365 > Retention** page in the compliance portal. Edit the retention policy identified in the previous step and remove the mailbox from the list of recipients included in the retention policy.
+After identifying the retention policy, go to the **Data lifecycle management > Microsoft 365 > Retention page** in the compliance portal. Edit the retention policy identified in the previous step and remove the mailbox from the list of recipients included in the retention policy.
 
 If a mailbox is excluded from an organization-wide Microsoft Purview retention policy, the GUID for the retention policy that the mailbox is excluded from is displayed in the **InPlaceHolds** property and is identified by the `-mbx` prefix.
 
@@ -112,13 +123,12 @@ If a mailbox is excluded from an organization-wide Microsoft Purview retention p
 Get-Mailbox <username> | FL InPlaceHolds
 
 ```
-Check the InPlaceHolds property and ensure the prefix shows empty or (-MBX).
-
-
+Check the InPlaceHolds property and ensure the prefix shows empty or (`-MBX`).
 
 
 ## Step 5: Delete Chat Messages from Teams
 - We can use one of the following two options to perform the purge request.
+
 ### Option One: Microsoft Graph Explorer
 
 To complete the purge process in Graph Explorer, you may need to consent to the correct Graph Explorer permissions. We will use a PowerShell script and Microsoft Graph Explorer to perform the following three tasks:
@@ -141,10 +151,10 @@ To complete the purge process in Graph Explorer, you may need to consent to the 
    - Scroll through the response to locate the eDiscovery (Premium) case. Use the `displayName` property to identify the case.
    - Copy the corresponding ID (or copy and paste it to a text file). You'll use this ID in the next task to get the collection ID.
 
-     > **Tip:** Alternatively, to obtain the case ID, you can open the case in the Microsoft Purview compliance portal and copy the case ID from the URL. It shows something like `URL…Id=……`.
+     > **Tip:** Alternatively, to obtain the case `ID`, you can open the case in the Microsoft Purview compliance portal and copy the case ID from the URL. 
 
 2. **Get the eDiscovery Search ID (SearchId).**
-   - In Graph Explorer, run the following GET request to retrieve the ID for the collection created in Step 2, which contains the items you want to delete:
+   - In Graph Explorer, run the following `GET` request to retrieve the `ID` for the collection created in Step 2, which contains the items you want to delete:
      ```plaintext
      https://graph.microsoft.com/v1.0/security/cases/ediscoveryCases/{ediscoveryCaseID}/searches
      ```
@@ -152,7 +162,7 @@ To complete the purge process in Graph Explorer, you may need to consent to the 
 
    - Scroll through the response to locate the collection containing the items you want to delete. Use the `displayName` property to identify the collection created in Step 3.
    - In the response, the search query from the collection is displayed in the `contentQuery` property. Items returned by this query will be deleted in the next task.
-   - Copy the corresponding ID (or copy and paste it to a text file). You'll use this ID in the next task to delete the chat messages.
+   - Copy the corresponding `ID` (or copy and paste it to a text file). You'll use this ID in the next task to delete the chat messages.
 
 
   ![alt text](image-3.png)
@@ -160,7 +170,7 @@ To complete the purge process in Graph Explorer, you may need to consent to the 
 
 ### Delete the Chat Messages with Graph API
 
-1. In Graph Explorer, run the following POST request to delete the items returned by the collection created in Step 2.
+1. In Graph Explorer, run the following `POST` request to delete the items returned by the collection created in Step 2.
 2. Use the value `https://graph.microsoft.com/v1.0/security/cases/ediscoveryCases/{ediscoveryCaseID}/searches/{ediscoverySearchID}/purgeData` in the address bar of the request query, where `{ediscoveryCaseID}` and `{ediscoverySearchID}` are the IDs obtained in the previous procedures.
 3. If the POST request is successful, an HTTP response code: 200 will be displayed in a green banner stating that the request was accepted. For more information on purge data, see sourceCollection: purgeData.
 
@@ -169,8 +179,14 @@ To complete the purge process in Graph Explorer, you may need to consent to the 
 You can also delete chat messages using PowerShell. For example, to delete messages in the US Government cloud, you could use a command similar to the one below, but you need to specify the environment as `USGov`. For commercial tenants, you don't need to specify the environment.
 
 ```powershell
-# Example command to delete messages in the US Government cloud
-Remove-TeamsChatMessage -Identity <MessageID> -Environment USGov
+# Example command to delete messages in the US Government cloud/GCC/
+Connect-MgGraph -Scopes "ediscovery.ReadWrite.All" -Environment USGov
+Use the:  Connect-MgGraph -Scopes "ediscovery.ReadWrite.All"   #without specifying the environment if you are not able to connect with the environment specified (commerial tenant).
+#Run the following to check the search collection"
+Invoke-MgGraphRequest -Method Get -Uri '/v1.0/security/cases/ediscoveryCases/{`ediscoveryCaseID`}/searches/{ediscoverySearchID}'
+# Run the following to delete chat messages
+Invoke-MgGraphRequest -Method POST -Uri '/v1.0/security/cases/ediscoveryCases/*<ediscoveryCaseID>*/searches/<search ID>/purgeData'
+
 
 ```
 
@@ -193,7 +209,7 @@ Note: SingleItemRecoveryEnabled can be switched to True by itself (broken by des
 
 After verifying that chat messages are deleted and removed from the Teams client, reapply the holds and retention policies that were removed in Step 4.
 
-Note: End users have the capability to purge items during the window after removing the hold and retentions (Step 4) and before reapplying the hold (Step 7). Reapplying the holds and retention policies removed in Step 4 as soon as the purge is verified is crucial to minimize the risk of losing data.
+`*Note*`: End users have the capability to purge items during the window after removing the hold and retentions (Step 4) and before reapplying the hold (Step 7). Reapplying the holds and retention policies removed in Step 4 as soon as the purge is verified is crucial to minimize the risk of losing data.
 
 Example: If SingleItemRecovery was disabled in Step 4, reapply the hold by running the following script:
 
@@ -220,3 +236,26 @@ Feel free to contribute to this guide by submitting a pull request or opening an
 https://learn.microsoft.com/en-us/purview/ediscovery-search-and-delete-teams-chat-messages  
 https://learn.microsoft.com/en-us/purview/ediscovery-delete-items-in-the-recoverable-items-folder-of-mailboxes-on-hold#step-5-delete-items-in-the-recoverable-items-folder
 https://learn.microsoft.com/en-us/purview/retention-policies-teams
+
+
+# Knowledge Base Article
+
+## Introduction
+
+Welcome to our Knowledge Base Article! We hope you find this information helpful.
+
+## How to Leave Comments or Suggestions
+
+If you have any comments or suggestions, please leave a comment here.
+
+## Content
+
+- Topic 1
+- Topic 2
+- Topic 3
+
+## Feedback
+
+We appreciate your feedback! Feel free to leave comments or suggestions by using the link above.
+
+Thank you for reading!
