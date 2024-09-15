@@ -1,5 +1,5 @@
 # Search for and Delete Chat Messages in Teams
-*auther: Kas Tsaedu*
+Auther: *Kas Tsaedu*
 
 ## Overview
 This guide primarily outlines the process for searching for and deleting chat messages in Teams using eDiscovery (Premium) and the Microsoft Graph Explorer. I developed this draft due to the numerous discrepancies and inconsistencies found in the official Microsoft documentation titled “Search for and delete chat messages in Teams” While attempting to follow this document in my job, I discovered significant errors and a lack of clarity in the official Microsoft KBA. This motivated me to write a clearer and more user-friendly set of instructions. Administrators can use this guide to find and remove sensitive or inappropriate content or to respond to data spillage incidents where confidential or malicious information has been released through Teams chat messages in Microsoft 365.
@@ -42,7 +42,7 @@ Minimum Admin role required to complete the task:
 
 ![alt text](image-6.png)
 
-**Notes** Administrators can add multiple collections as required.
+**Notes:** Administrators can add multiple collections as required.
 - For searching for chat messages: use the **Type** condition and select the **Instant messages** option when building the search query for the collection estimate.
 - Adding a date range or several keywords to narrow the scope of the collection to items relevant to your search and delete investigation is recommended.
 
@@ -210,7 +210,7 @@ Note: SingleItemRecoveryEnabled can be switched to True by itself (broken by des
 
 After verifying that chat messages are deleted and removed from the Teams client, reapply the holds and retention policies that were removed in Step 4.
 
-`*Note*`: End users have the capability to purge items during the window after removing the hold and retentions (Step 4) and before reapplying the hold (Step 7). Reapplying the holds and retention policies removed in Step 4 as soon as the purge is verified is crucial to minimize the risk of losing data.
+`Note`: End users have the capability to purge items during the window after removing the hold and retentions (Step 4) and before reapplying the hold (Step 7). Reapplying the holds and retention policies removed in Step 4 as soon as the purge is verified is crucial to minimize the risk of losing data.
 
 Example: If SingleItemRecovery was disabled in Step 4, reapply the hold by running the following script:
 
